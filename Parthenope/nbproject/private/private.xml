@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/home/user/basysmx3/Parthenope/src/io/lcd-display.c</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/system/interrupts.c</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/kissfft/kissfft.c</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/io/d-pad-control.c</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/io/d-pad-control.h</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/system/system.h</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/main.c</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/kissfft/kissfft.h</file>
+            <file>file:/home/user/basysmx3/Parthenope/nbproject/Makefile-impl.mk</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/io/recording-manager.c</file>
+            <file>file:/home/user/basysmx3/Parthenope/nbproject/Makefile-basysmx3.mk</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/libpack/rgbled.c</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/libpack/uart.c</file>
+            <file>file:/home/user/basysmx3/Parthenope/src/io/recording-manager.h</file>
+        </group>
+    </open-files>
 </project-private>

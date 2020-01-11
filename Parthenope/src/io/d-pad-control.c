@@ -18,7 +18,7 @@ static const button_function button_lookup[] =
     { .button = CENTER_B, .action = SELECT         },
     { .button = UP_B,     .action = NEXT_SLOT      },
     { .button = DOWN_B,   .action = PREVIOUS_SLOT  },
-    { .button = RIGHT_B,   .action = PLAY          },
+    { .button = RIGHT_B,  .action = PLAY           },
     { .button = LEFT_B,  .action = RECORD          },
 };
 

@@ -16,6 +16,11 @@
         <itemPath>src/io/recording-manager.c</itemPath>
         <itemPath>src/io/recording-manager.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="kissfft" displayName="kissfft" projectFiles="true">
+        <itemPath>src/kissfft/kissfft.h</itemPath>
+        <itemPath>src/kissfft/kissfft.c</itemPath>
+        <itemPath>src/kissfft/_kiss_fft_guts.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="libpack" displayName="libpack" projectFiles="true">
         <itemPath>src/libpack/mic.h</itemPath>
         <itemPath>src/libpack/i2c.h</itemPath>
@@ -192,7 +197,7 @@
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-cross-reference-file" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
-        <property key="heap-size" value=""/>
+        <property key="heap-size" value="1024"/>
         <property key="input-libraries" value=""/>
         <property key="kseg-length" value=""/>
         <property key="kseg-origin" value=""/>
