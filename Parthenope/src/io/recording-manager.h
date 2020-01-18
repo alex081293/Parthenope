@@ -5,7 +5,7 @@
 extern "C"{
 #endif
 
-#define SLOT_SIZE       0xF000 * 2
+#define SLOT_SIZE       0x900 * 2
 
 void     RECORDING_MANAGER_Init();
 

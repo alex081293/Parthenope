@@ -46,7 +46,7 @@
 #include "mic.h"
 
 
-#define RECORD_SIZE 2
+#define RECORD_SIZE 2*25000
 
 // the array of samples, to be stored when recording (Mode 2) and to be played when playing back (Mode 3).
 unsigned short rgAudioBuf[RECORD_SIZE];
@@ -60,7 +60,7 @@ int cntAudioBuf, idxAudioBuf;
 //  1   Mirror         TMR_FREQ_SOUND
 //  2   Record sound   TMR_FREQ_SOUND
 //  3   Play sound     TMR_FREQ_SOUND
-unsigned char bAudioMode = -1;
+uint8_t bAudioMode = -1;
 
 // This array contains the values that implement one syne period, over 25 samples. 
 // They are generated using this site: 
@@ -76,6 +76,9 @@ unsigned short rgSinSamples[] = {
 #define TMR_FREQ_SOUND   16000 // 16 kHz
 #define TMR_FREQ_SINE   48000 // 48 kHz
 
+unsigned char volatile status = 0;
+
+static void AUDIO_ConfigurePins();
 
 /* ------------------------------------------------------------ */
 /***	Timer3ISR
@@ -91,34 +94,52 @@ unsigned short rgSinSamples[] = {
 void __ISR(_TIMER_3_VECTOR, IPL7AUTO) Timer3ISR(void) 
 {  
     unsigned short v;
-    
-    
-    if(bAudioMode == 0)
-    {   // play sine
-        // load sine value into OC register
-    //    OC1RS = 4*pAudioSamples[(++idxAudioBuf) % cntAudioBuf];
-    }
-    if(bAudioMode == 1)
-    {
-        // mirror, get sample from MIC and throw it to speaker
-        OC1RS = (MIC_Val()*PR3) >> 10;
-    }
-    if ( (bAudioMode == 2) || (bAudioMode == 4))
-    {
-        // record sound
-        // store the value acquired from MIC into the record buffer.
-        pAudioSamples[(idxAudioBuf++) % cntAudioBuf] = MIC_Val();
-    }
-    if((bAudioMode == 3) || (bAudioMode == 5))
-    {
-        // play sound
-        // retrieve value from the record buffer.
-        v = pAudioSamples[(++idxAudioBuf) % cntAudioBuf];
-        // amplify the value
-        v <<= 2;
-        // load buffer value into OC register
-        OC1RS = v;
 
+    switch (bAudioMode)
+    {
+        case 0:
+            OC1RS = 4*pAudioSamples[(++idxAudioBuf) % cntAudioBuf];
+            break;
+        case 1:
+            OC1RS = (MIC_Val()*PR3) >> 10;
+            break;
+        case 2:
+        case 4:
+            pAudioSamples[(idxAudioBuf++) % cntAudioBuf] = MIC_Val();
+            break;
+        case 3:
+        case 5:
+            v = pAudioSamples[idxAudioBuf];
+
+            // amplify the value
+            v <<= 2;
+            // load buffer value into OC register
+            OC1RS = v;
+            break;
+    }
+
+    switch (bAudioMode)
+    {
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            if (++idxAudioBuf == cntAudioBuf)
+            {
+                if (bAudioMode == 3 || bAudioMode == 5)
+                {
+                    idxAudioBuf = 0;
+                }
+                else
+                {
+                    bAudioMode = -1;
+                    AUDIO_Stop();
+                }
+            }
+        case 0:
+        case 1:
+        default:
+            break;
     }
     
     IFS0bits.T3IF = 0;      // clear Timer3 interrupt flag
@@ -150,12 +171,12 @@ void __ISR(_TIMER_3_VECTOR, IPL7AUTO) Timer3ISR(void)
 **      The timer period constant is computed using TMR_FREQ_SINE and TMR_FREQ_SOUND definitions (located in this source file)
 **      and peripheral bus frequency definition (PB_FRQ, located in config.h).
 */
-void AUDIO_Init(unsigned char bMode)
+void AUDIO_Start(unsigned char bMode)
 {   
     // close the timer and OC if the AUDIO_Init function is called when the AUDIO is already initialized
     if(bAudioMode != -1)
     {
-        AUDIO_Close();
+        AUDIO_Stop();
     }
     bAudioMode = bMode;
     AUDIO_ConfigurePins();
@@ -224,7 +245,7 @@ void AUDIO_Init(unsigned char bMode)
 **      The function uses pin related definitions from config.h file.
 **      This is a low-level function called by AUDIO_Init(), so user should avoid calling it directly.           
 */
-void AUDIO_ConfigurePins()
+static void AUDIO_ConfigurePins()
 {
     // Configure AUDIO output as digital output.
     tris_A_OUT = 0;    
@@ -246,7 +267,7 @@ void AUDIO_ConfigurePins()
 **      
 **          
 */
-unsigned char AUDIO_GetAudioMode()
+uint8_t AUDIO_GetAudioMode()
 {
     return bAudioMode;
 }
@@ -269,12 +290,12 @@ unsigned char AUDIO_GetAudioMode()
 */
 void AUDIO_InitPlayBack(unsigned short *pAudioSamples1, int cntBuf1)
 {
-        // init playback
+    // init playback
 
     idxAudioBuf = 0;
     cntAudioBuf = cntBuf1;
     pAudioSamples = pAudioSamples1;
-
+    status = 1;
     // load first value
     OC1RS = pAudioSamples[0];
 
@@ -320,11 +341,16 @@ void AUDIO_InitRecord(unsigned short *pAudioSamples1, int cntBuf1)
 **      
 **          
 */
-void AUDIO_Close()
+void AUDIO_Stop()
 {
-        T3CONbits.ON = 0;       // turn off Timer3
-        OC1CONbits.ON = 0;      // Turn off OC1
-        
+    T3CONbits.ON = 0;       // turn off Timer3
+    OC1CONbits.ON = 0;      // Turn off OC1
+    status = 0;
+}
+
+int AUDIO_IsBusy()
+{
+    return status;
 }
 
 /* *****************************************************************************

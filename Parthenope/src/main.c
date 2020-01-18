@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "string.h"
-#include<stdio.h> 
+#include <stdio.h> 
 
 #include "system/system.h"
 
@@ -12,9 +12,6 @@
 #include "io/recording-manager.h"
 
 //////////////////////////////////////////////////////////////////////////////////
-
-#define AUDIO_MODE_RECORD     2
-#define AUDIO_MODE_PLAYBACK   3
 
 //////////////////////////////////////////////////////////////////////////////////
 
